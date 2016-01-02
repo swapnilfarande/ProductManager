@@ -39,6 +39,7 @@ use yii\db\Expression;
  */
 class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
+    public $confirm_password;
     /**
      * @inheritdoc
      */
@@ -53,12 +54,15 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
+            [['password', 'confirm_password'], 'required', 'on'=>'new'],
+            ['confirm_password', 'compare', 'compareAttribute'=>'password', 'on'=>'new'],
+            [['first_name', 'last_name', 'username'], 'required'],
             [['created_by', 'updated_by'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['first_name', 'last_name', 'username', 'address'], 'string', 'max' => 255],
             [['password'], 'string', 'max' => 1024],
             [['mobile'], 'string', 'max' => 25],
-            [['username'], 'unique']
+            [['username'], 'unique'],            
         ];
     }
 
@@ -79,6 +83,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'created_at' => 'Created At',
             'updated_by' => 'Updated By',
             'updated_at' => 'Updated At',
+            'confirm_password' => 'Confirm Password'
         ];
     }
     
@@ -298,5 +303,9 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function getUserRoleMappings()
     {
         return $this->hasMany(UserRoleMapping::className(), ['user_id' => 'user_id']);
+    }
+
+    public function checkBothPasswords($attribute, $params) {
+        $this->addError($attribute, 'eee');
     }
 }
